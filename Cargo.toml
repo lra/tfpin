@@ -9,6 +9,9 @@ repository = "https://github.com/lra/tfpin"
 readme = "README.md"
 keywords = ["terraform", "linter", "hcl", "ci"]
 categories = ["command-line-utilities", "development-tools"]
+# Keep the published crate to the runtime sources and docs; repo/CI machinery and test fixtures
+# aren't needed by consumers.
+exclude = ["tests/**", ".github/**", "action.yml"]
 
 [[bin]]
 name = "tfpin"
