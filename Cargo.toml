@@ -1,0 +1,32 @@
+[package]
+name = "tfpin"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+description = "Lint Terraform files against pinned versions and conventions declared in a config file"
+license = "GPL-3.0-or-later"
+repository = "https://github.com/lra/tfpin"
+readme = "README.md"
+keywords = ["terraform", "linter", "hcl", "ci"]
+categories = ["command-line-utilities", "development-tools"]
+
+[[bin]]
+name = "tfpin"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+globwalk = "0.9"
+hcl-rs = "0.19"
+serde = { version = "1", features = ["derive"] }
+toml = "1"
+
+[dev-dependencies]
+assert_cmd = "2"
+predicates = "3"
+tempfile = "3"
+
+[profile.release]
+strip = true
+lto = true
+codegen-units = 1

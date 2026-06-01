@@ -1,0 +1,36 @@
+# Example tfpin configuration. Copy to `.tfpin.toml` at the root of your Terraform repository and
+# adjust to your conventions. Every section is optional: a check only runs when its section is
+# present, and only enforces what you specify.
+
+# Enforced when a file sets `terraform { required_version = ... }`.
+terraform_version = "~> 1.15.5"
+
+# Top-level blocks that must not be left behind after a refactor.
+forbidden_blocks = ["moved", "import", "removed"]
+
+# Files to lint, relative to this config file. Defaults to ["**/*.tf"] when omitted.
+# `**/.terraform/**` is always excluded.
+include = ["**/*.tf"]
+# exclude = ["examples/**"]
+
+# Expected provider version constraints, by provider name. A provider that pins a different version
+# is flagged; one without a `version`, or one not listed here, is left alone.
+[providers]
+aws        = "~> 6.24"
+google     = "~> 7.7"
+kubernetes = "~> 2.37, >= 2.37.1"   # compound constraints are compared verbatim
+
+# Expected module version constraints, by module `source`.
+[modules]
+"terraform-aws-modules/vpc/aws" = "~> 6.2"
+
+# S3 backend convention. Every attribute listed here is enforced verbatim on the `backend "s3"`
+# block (any string/bool/number/array). `key_template` is special: `{dir}` is replaced by the
+# .tf file's directory relative to this config file (joined with `/`), and the result is compared
+# against the backend `key`. Files without an s3 backend are skipped.
+[backend.s3]
+allowed_account_ids = ["111111111111"]
+bucket              = "acme-terraform-state"
+region              = "us-west-1"
+use_lockfile        = true
+key_template        = "acme/infra/{dir}"
