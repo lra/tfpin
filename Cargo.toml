@@ -1,6 +1,6 @@
 [package]
 name = "tfpin"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 rust-version = "1.85"
 description = "Lint Terraform files against pinned versions and conventions declared in a config file"
@@ -11,7 +11,7 @@ keywords = ["terraform", "linter", "hcl", "ci"]
 categories = ["command-line-utilities", "development-tools"]
 # Keep the published crate to the runtime sources and docs; repo/CI machinery and test fixtures
 # aren't needed by consumers.
-exclude = ["tests/**", ".github/**", "action.yml"]
+exclude = ["tests/**", ".github/**", "action.yml", "RELEASING.md"]
 
 [[bin]]
 name = "tfpin"
