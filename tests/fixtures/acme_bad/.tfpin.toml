@@ -1,0 +1,16 @@
+terraform_version = "~> 1.15.5"
+forbidden_blocks  = ["moved", "import", "removed"]
+
+[providers]
+aws        = "~> 6.24"
+kubernetes = "~> 2.37, >= 2.37.1"
+
+[modules]
+"terraform-aws-modules/vpc/aws" = "~> 6.2"
+
+[backend.s3]
+allowed_account_ids = ["111111111111"]
+bucket              = "acme-terraform-state"
+region              = "us-west-1"
+use_lockfile        = true
+key_template        = "acme/infra/{dir}"

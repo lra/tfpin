@@ -1,0 +1,84 @@
+name: tfpin
+description: Lint Terraform files against pinned versions and conventions declared in .tfpin.toml.
+branding:
+  icon: anchor
+  color: purple
+
+inputs:
+  version:
+    description: "tfpin version to install: a release tag like v0.1.0, or 'latest'."
+    default: latest
+  config:
+    description: "Path to the .tfpin.toml config file (passed as --config). Optional; by default tfpin discovers it by walking up from the working directory."
+    default: ""
+  args:
+    description: "Additional arguments passed to tfpin, e.g. paths to scan or --verbose."
+    default: ""
+  working-directory:
+    description: "Directory in which to run tfpin."
+    default: "."
+
+runs:
+  using: composite
+  steps:
+    - name: Install tfpin
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        set -euo pipefail
+        repo="lra/tfpin"
+
+        os=$(uname -s)
+        arch=$(uname -m)
+        case "$os" in
+          Linux)  plat="unknown-linux-gnu" ;;
+          Darwin) plat="apple-darwin" ;;
+          *) echo "::error::tfpin: unsupported OS '$os'"; exit 1 ;;
+        esac
+        case "$arch" in
+          x86_64|amd64)  cpu="x86_64" ;;
+          arm64|aarch64) cpu="aarch64" ;;
+          *) echo "::error::tfpin: unsupported architecture '$arch'"; exit 1 ;;
+        esac
+        target="${cpu}-${plat}"
+        archive="tfpin-${target}.tar.gz"
+
+        version="${{ inputs.version }}"
+        if [ "$version" = "latest" ]; then
+          tag=$(gh release view --repo "$repo" --json tagName -q .tagName)
+        else
+          tag="$version"
+        fi
+        echo "Installing tfpin ${tag} for ${target}"
+
+        dest="${RUNNER_TEMP:-/tmp}/tfpin-bin"
+        mkdir -p "$dest"
+        gh release download "$tag" --repo "$repo" \
+          --pattern "$archive" --pattern "${archive}.sha256" --dir "$dest"
+
+        (
+          cd "$dest"
+          if command -v sha256sum >/dev/null 2>&1; then
+            sha256sum --check "${archive}.sha256"
+          else
+            shasum -a 256 --check "${archive}.sha256"
+          fi
+          tar -xzf "$archive"
+          chmod +x tfpin
+        )
+        echo "$dest" >> "$GITHUB_PATH"
+
+    - name: Run tfpin
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        set -euo pipefail
+        config="${{ inputs.config }}"
+        extra="${{ inputs.args }}"
+        # $extra is intentionally unquoted so multiple arguments word-split.
+        if [ -n "$config" ]; then
+          tfpin --config "$config" $extra
+        else
+          tfpin $extra
+        fi

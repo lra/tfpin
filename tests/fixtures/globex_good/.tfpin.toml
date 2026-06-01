@@ -1,0 +1,21 @@
+# A different organisation's convention, served by the same engine: the backend key mirrors the
+# path with a trailing filename, and the S3 block carries extra attributes (encrypt, kms_key_id,
+# profile) beyond the basics.
+terraform_version = "~> 1.15.5"
+forbidden_blocks  = ["moved", "import", "removed"]
+
+[providers]
+aws       = "~> 6.46"
+github    = "~> 6.12"
+hcloud    = "~> 1.63"
+tailscale = "~> 0.29"
+
+[backend.s3]
+allowed_account_ids = ["222222222222"]
+bucket              = "globex-terraform-state"
+region              = "us-east-1"
+encrypt             = true
+kms_key_id          = "alias/globex-terraform-state"
+use_lockfile        = true
+profile             = "globex"
+key_template        = "{dir}/terraform.tfstate"

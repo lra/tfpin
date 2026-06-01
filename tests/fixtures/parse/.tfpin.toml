@@ -1,0 +1,7 @@
+# Minimal config: enough to exercise the version/provider checks while these files lean on tricky
+# HCL constructs. No [backend.s3] or forbidden_blocks, so those checks stay out of the way and the
+# whole tree is expected to pass — the point is proving the parser does not choke.
+terraform_version = "~> 1.15.5"
+
+[providers]
+aws = "~> 6.24"
