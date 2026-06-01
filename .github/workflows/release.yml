@@ -58,4 +58,15 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@stable
-      - run: cargo publish --locked --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
+      - name: Publish to crates.io (skip if this version already exists)
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: |
+          set -euo pipefail
+          version=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].version')
+          if curl -fsS -H "User-Agent: tfpin-release" \
+               "https://crates.io/api/v1/crates/tfpin/${version}" -o /dev/null; then
+            echo "tfpin ${version} is already on crates.io — skipping publish."
+          else
+            cargo publish --locked
+          fi
