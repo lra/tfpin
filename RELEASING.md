@@ -17,8 +17,7 @@ runs when you push a tag matching `v[0-9]+.*` (e.g. `v0.2.0`). One tag push prod
    version = "0.2.0"
    ```
 
-   Run `cargo build` so `Cargo.lock` picks up the new version, and update `CHANGELOG.md` if you
-   keep one.
+   Run `cargo build` so `Cargo.lock` picks up the new version.
 
 2. **Bump the version reference** in the README's GitHub Action example so users pin the new
    release:
