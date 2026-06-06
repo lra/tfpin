@@ -1,4 +1,4 @@
-name: tfpin
+name: tfpin - Terraform Version Pin Check
 description: Lint Terraform files against pinned versions and conventions declared in .tfpin.toml.
 branding:
   icon: anchor
