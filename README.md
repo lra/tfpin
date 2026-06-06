@@ -94,7 +94,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: lra/tfpin@v0.1.1
+      - uses: lra/tfpin@v1
         # with:
         #   version: v0.1.0        # or "latest" (default)
         #   config: ci/.tfpin.toml # optional
