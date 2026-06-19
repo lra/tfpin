@@ -35,7 +35,12 @@ impl Violation {
 ///
 /// When `ignore_forbidden_blocks` is set, the `forbidden_blocks` check is skipped entirely
 /// regardless of what the config declares.
-pub fn run_all(dir: &str, body: &Body, cfg: &Config, ignore_forbidden_blocks: bool) -> Vec<Violation> {
+pub fn run_all(
+    dir: &str,
+    body: &Body,
+    cfg: &Config,
+    ignore_forbidden_blocks: bool,
+) -> Vec<Violation> {
     let mut out = Vec::new();
     terraform_version::check(body, cfg, &mut out);
     providers::check(body, cfg, &mut out);
