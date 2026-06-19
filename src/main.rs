@@ -31,6 +31,10 @@ struct Cli {
     /// Print each file as it is checked (to stderr).
     #[arg(short, long)]
     verbose: bool,
+
+    /// Skip the `forbidden_blocks` check (do not flag leftover `moved`/`import`/`removed` blocks).
+    #[arg(long)]
+    ignore_forbidden_blocks: bool,
 }
 
 fn main() -> ExitCode {
@@ -95,7 +99,7 @@ fn run(cli: &Cli) -> Result<bool, String> {
         };
 
         let dir = relative_dir(&file, &config_dir);
-        for violation in checks::run_all(&dir, &body, &cfg) {
+        for violation in checks::run_all(&dir, &body, &cfg, cli.ignore_forbidden_blocks) {
             println!("{shown}: {}", violation.message);
             any_error = true;
         }

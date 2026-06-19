@@ -104,6 +104,39 @@ fn acme_bad_tree_fails_with_expected_violations() {
         .stdout(contains(r#"found refactoring block "removed" leftover"#));
 }
 
+// --- `--ignore-forbidden-blocks`: suppress only the forbidden_blocks check. ----------------------
+
+#[test]
+fn ignore_forbidden_blocks_suppresses_only_that_check() {
+    // The flag clears the three refactoring-block violations but leaves every other check intact,
+    // so the bad tree still fails on its version/backend violations.
+    tfpin_in("acme_bad")
+        .arg("--ignore-forbidden-blocks")
+        .assert()
+        .failure()
+        .stdout(contains(r#"found refactoring block "moved" leftover"#).not())
+        .stdout(contains(r#"found refactoring block "import" leftover"#).not())
+        .stdout(contains(r#"found refactoring block "removed" leftover"#).not())
+        .stdout(contains(
+            r#"wrong terraform required_version: found "~> 1.14.0", expected "~> 1.15.5""#,
+        ))
+        .stdout(contains(
+            "S3 backend region is us-east-1 (expected us-west-1)",
+        ));
+}
+
+#[test]
+fn ignore_forbidden_blocks_clears_an_otherwise_clean_file() {
+    // refactoring.tf contains nothing but leftover moved/import/removed blocks, so suppressing the
+    // check leaves it with zero violations: a clean, silent pass.
+    tfpin_in("acme_bad")
+        .arg("platform/cloud/wrong/refactoring.tf")
+        .arg("--ignore-forbidden-blocks")
+        .assert()
+        .success()
+        .stdout(predicate::str::is_empty());
+}
+
 // --- Path narrowing and config/discovery behaviour. ----------------------------------------------
 
 #[test]

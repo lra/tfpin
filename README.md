@@ -35,11 +35,14 @@ tfpin [PATHS]...
 - `-c, --config <FILE>` — path to the config. By default tfpin discovers `.tfpin.toml` by walking
   up from the current directory.
 - `-v, --verbose` — print each file as it is checked.
+- `--ignore-forbidden-blocks` — skip the `forbidden_blocks` check for this run (handy while a
+  refactor is mid-flight).
 
 ```sh
-tfpin                       # check the whole repo
-tfpin platform/stack/prod   # check one subtree
-tfpin -c ci/.tfpin.toml -v  # explicit config, verbose
+tfpin                          # check the whole repo
+tfpin platform/stack/prod      # check one subtree
+tfpin -c ci/.tfpin.toml -v     # explicit config, verbose
+tfpin --ignore-forbidden-blocks  # skip the forbidden_blocks check
 ```
 
 Exit codes: `0` clean · `1` violations found · `2` could not run (missing config, bad pattern, …).
@@ -99,6 +102,7 @@ jobs:
         #   version: v0.1.0        # or "latest" (default)
         #   config: ci/.tfpin.toml # optional
         #   args: "platform"       # extra args / paths
+        #   ignore-forbidden-blocks: true  # skip the forbidden_blocks check
         #   working-directory: .
 ```
 

@@ -32,12 +32,17 @@ impl Violation {
 ///
 /// `dir` is the file's parent directory expressed relative to the config file, '/'-joined; it is
 /// substituted into the backend `key_template`'s `{dir}` placeholder.
-pub fn run_all(dir: &str, body: &Body, cfg: &Config) -> Vec<Violation> {
+///
+/// When `ignore_forbidden_blocks` is set, the `forbidden_blocks` check is skipped entirely
+/// regardless of what the config declares.
+pub fn run_all(dir: &str, body: &Body, cfg: &Config, ignore_forbidden_blocks: bool) -> Vec<Violation> {
     let mut out = Vec::new();
     terraform_version::check(body, cfg, &mut out);
     providers::check(body, cfg, &mut out);
     modules::check(body, cfg, &mut out);
     backend::check(dir, body, cfg, &mut out);
-    forbidden_blocks::check(body, cfg, &mut out);
+    if !ignore_forbidden_blocks {
+        forbidden_blocks::check(body, cfg, &mut out);
+    }
     out
 }

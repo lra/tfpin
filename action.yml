@@ -14,6 +14,9 @@ inputs:
   args:
     description: "Additional arguments passed to tfpin, e.g. paths to scan or --verbose."
     default: ""
+  ignore-forbidden-blocks:
+    description: "Skip the forbidden_blocks check (passes --ignore-forbidden-blocks)."
+    default: "false"
   working-directory:
     description: "Directory in which to run tfpin."
     default: "."
@@ -76,9 +79,14 @@ runs:
         set -euo pipefail
         config="${{ inputs.config }}"
         extra="${{ inputs.args }}"
-        # $extra is intentionally unquoted so multiple arguments word-split.
+        ignore_forbidden="${{ inputs.ignore-forbidden-blocks }}"
+
+        flags=()
         if [ -n "$config" ]; then
-          tfpin --config "$config" $extra
-        else
-          tfpin $extra
+          flags+=(--config "$config")
         fi
+        if [ "$ignore_forbidden" = "true" ]; then
+          flags+=(--ignore-forbidden-blocks)
+        fi
+        # $extra is intentionally unquoted so multiple arguments word-split.
+        tfpin "${flags[@]+"${flags[@]}"}" $extra
